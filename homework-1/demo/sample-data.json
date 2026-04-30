@@ -1,0 +1,21 @@
+[
+  {
+    "toAccount": "ACC-123",
+    "amount": 1000.00,
+    "currency": "USD",
+    "type": 0
+  },
+  {
+    "fromAccount": "ACC-123",
+    "amount": 200.00,
+    "currency": "USD",
+    "type": 1
+  },
+  {
+    "fromAccount": "ACC-123",
+    "toAccount": "ACC-456",
+    "amount": 150.00,
+    "currency": "USD",
+    "type": 2
+  }
+]

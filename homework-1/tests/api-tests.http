@@ -1,0 +1,150 @@
+@baseUrl = http://localhost:5000
+
+### ====================================================
+### --- VALIDATION & EDGE CASES ---
+### ====================================================
+
+### 1.1 Validation: Negative Amount & Invalid Currency
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+
+{
+  "toAccount": "ACC-123",
+  "amount": -50.00,
+  "currency": "XYZ",
+  "type": 0
+}
+
+### 1.2 Validation: Too many decimal places
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+
+{
+  "toAccount": "ACC-123",
+  "amount": 100.123,
+  "currency": "USD",
+  "type": 0
+}
+
+### 1.3 Validation: Missing ToAccount for Deposit
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+
+{
+  "amount": 100.00,
+  "currency": "USD",
+  "type": 0
+}
+
+### 1.4 Validation: Missing FromAccount for Withdrawal
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+
+{
+  "amount": 100.00,
+  "currency": "USD",
+  "type": 1
+}
+
+### 1.5 Validation: Missing Both Accounts for Transfer
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+
+{
+  "amount": 100.00,
+  "currency": "USD",
+  "type": 2
+}
+
+### 1.6 Validation: Invalid Account Format
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+
+{
+  "fromAccount": "BADFORMAT",
+  "toAccount": "123-ACC",
+  "amount": 100.00,
+  "currency": "USD",
+  "type": 2
+}
+
+### ====================================================
+### --- NOT FOUND SCENARIOS ---
+### ====================================================
+
+### 2.1 Not Found: Fake Transaction ID
+GET {{baseUrl}}/transactions/00000000-0000-0000-0000-000000000000
+Accept: application/json
+
+### 2.2 Not Found: Balance for Non-Existent Account
+GET {{baseUrl}}/accounts/NONEXISTENT-999/balance
+Accept: application/json
+
+### 2.3 Not Found: Summary for Non-Existent Account
+GET {{baseUrl}}/accounts/NONEXISTENT-999/summary
+Accept: application/json
+
+### ====================================================
+### --- SUCCESS PATHS ---
+### ====================================================
+
+### 3.1 Creating a Deposit for ACC-TEST ($1000)
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+
+{
+  "toAccount": "ACC-TEST",
+  "amount": 1000.00,
+  "currency": "USD",
+  "type": 0
+}
+
+### 3.2 Fetching the created transaction by ID
+# Replace ID below with the actual generated ID from 3.1
+@transactionId = 00000000-0000-0000-0000-000000000000
+GET {{baseUrl}}/transactions/{{transactionId}}
+Accept: application/json
+
+### 3.3 Creating a Withdrawal from ACC-TEST ($200)
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+
+{
+  "fromAccount": "ACC-TEST",
+  "amount": 200.00,
+  "currency": "USD",
+  "type": 1
+}
+
+### 3.4 Creating a Transfer from ACC-TEST to ACC-RECEIVER ($150)
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+
+{
+  "fromAccount": "ACC-TEST",
+  "toAccount": "ACC-RECEIVER",
+  "amount": 150.00,
+  "currency": "USD",
+  "type": 2
+}
+
+### ====================================================
+### --- CALCULATIONS & QUERIES ---
+### ====================================================
+
+### 4.1 Fetching Account Balance for ACC-TEST
+# Expected: 1000 - 200 - 150 = 650
+GET {{baseUrl}}/accounts/ACC-TEST/balance
+Accept: application/json
+
+### 4.2 Fetching Account Summary for ACC-TEST
+GET {{baseUrl}}/accounts/ACC-TEST/summary
+Accept: application/json
+
+### 4.3 Filtering Transactions (Combined filter)
+GET {{baseUrl}}/transactions?accountId=ACC-TEST&type=deposit
+Accept: application/json
+
+### 4.4 GET all transactions
+GET {{baseUrl}}/transactions
+Accept: application/json

@@ -1,0 +1,156 @@
+@baseUrl = http://localhost:5000
+
+### ----------------------------------------------------
+### 1. GET all transactions (should be empty initially)
+### ----------------------------------------------------
+GET {{baseUrl}}/transactions
+Accept: application/json
+
+### ----------------------------------------------------
+### 2. POST /transactions - Validation Failure (Multiple Errors)
+### ----------------------------------------------------
+# Fails on: Negative amount, Invalid currency, Invalid account format
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+
+{
+  "toAccount": "INVALID_ACCOUNT",
+  "amount": -50.00,
+  "currency": "XYZ",
+  "type": 0
+}
+
+### ----------------------------------------------------
+### 3. POST /transactions - Validation Failure (Decimals & Missing Account)
+### ----------------------------------------------------
+# Fails on: > 2 decimal places, Missing FromAccount for Withdrawal
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+
+{
+  "toAccount": "ACC-123",
+  "amount": 100.123,
+  "currency": "EUR",
+  "type": 1
+}
+
+### ----------------------------------------------------
+### 4. POST /transactions - Success (Deposit to ACC-123)
+### ----------------------------------------------------
+# Type 0 = Deposit
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+
+{
+  "toAccount": "ACC-123",
+  "amount": 1000.00,
+  "currency": "USD",
+  "type": 0
+}
+
+### ----------------------------------------------------
+### 5. POST /transactions - Success (Withdrawal from ACC-123)
+### ----------------------------------------------------
+# Type 1 = Withdrawal
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+
+{
+  "fromAccount": "ACC-123",
+  "amount": 200.00,
+  "currency": "USD",
+  "type": 1
+}
+
+### ----------------------------------------------------
+### 6. POST /transactions - Success (Transfer from ACC-123 to ACC-456)
+### ----------------------------------------------------
+# Type 2 = Transfer
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+
+{
+  "fromAccount": "ACC-123",
+  "toAccount": "ACC-456",
+  "amount": 150.00,
+  "currency": "USD",
+  "type": 2
+}
+
+### ----------------------------------------------------
+### 7. GET all transactions (should now have 3 items)
+### ----------------------------------------------------
+GET {{baseUrl}}/transactions
+Accept: application/json
+
+### ----------------------------------------------------
+### 7.1 GET transactions filtered by account
+### ----------------------------------------------------
+GET {{baseUrl}}/transactions?accountId=ACC-456
+Accept: application/json
+
+### ----------------------------------------------------
+### 7.2 GET transactions filtered by type
+### ----------------------------------------------------
+# Type 'withdrawal' (case-insensitive due to Enum.TryParse)
+GET {{baseUrl}}/transactions?type=withdrawal
+Accept: application/json
+
+### ----------------------------------------------------
+### 7.3 GET transactions filtered by date range
+### ----------------------------------------------------
+# This requires a valid date range. Adjust dates as needed.
+GET {{baseUrl}}/transactions?from=2024-01-01T00:00:00Z&to=2030-12-31T23:59:59Z
+Accept: application/json
+
+### ----------------------------------------------------
+### 7.4 GET transactions with combined filters
+### ----------------------------------------------------
+GET {{baseUrl}}/transactions?accountId=ACC-123&type=deposit&from=2024-01-01T00:00:00Z
+Accept: application/json
+
+### ----------------------------------------------------
+### 8. GET a specific transaction by ID
+### ----------------------------------------------------
+# Replace the GUID below with an actual ID from the POST or GET responses above
+@transactionId = 00000000-0000-0000-0000-000000000000
+GET {{baseUrl}}/transactions/{{transactionId}}
+Accept: application/json
+
+### ----------------------------------------------------
+### 9. GET a specific transaction by ID - Not Found
+### ----------------------------------------------------
+GET {{baseUrl}}/transactions/11111111-1111-1111-1111-111111111111
+Accept: application/json
+
+### ----------------------------------------------------
+### 10. GET Account Balance for ACC-123
+### ----------------------------------------------------
+# Should be 1000 (Deposit) - 200 (Withdrawal) - 150 (Transfer) = 650
+GET {{baseUrl}}/accounts/ACC-123/balance
+Accept: application/json
+
+### ----------------------------------------------------
+### 11. GET Account Balance for ACC-456
+### ----------------------------------------------------
+# Should be 150 (Transfer)
+GET {{baseUrl}}/accounts/ACC-456/balance
+Accept: application/json
+
+### ----------------------------------------------------
+### 12. GET Account Balance for non-existent account - Not Found
+### ----------------------------------------------------
+GET {{baseUrl}}/accounts/NON-EXISTENT/balance
+Accept: application/json
+
+### ----------------------------------------------------
+### 13. GET Account Summary for ACC-123
+### ----------------------------------------------------
+GET {{baseUrl}}/accounts/ACC-123/summary
+Accept: application/json
+
+### ----------------------------------------------------
+### 14. GET Account Summary for ACC-456
+### ----------------------------------------------------
+GET {{baseUrl}}/accounts/ACC-456/summary
+Accept: application/json
