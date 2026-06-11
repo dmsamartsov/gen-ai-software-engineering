@@ -1,0 +1,104 @@
+🏦 Banking API Automated Demo Suite
+==================================
+Ensure the API is running at http://localhost:5000 before continuing!
+
+🔴 1. Testing Validation (Negative amount & Invalid Currency)
+{
+"error": "Validation failed",
+"details": [
+{
+"field": "amount",
+"message": "Amount must be a positive number"
+},
+{
+"field": "currency",
+"message": "Invalid currency code"
+},
+{
+"field": "toAccount",
+"message": "Account numbers should follow format ACC-XXXXX"
+}
+]
+}
+
+----------------------------------
+
+🟢 2. Creating a Deposit for ACC-123 (000)
+{
+"id": "4d4eb1db-6798-4930-bc8f-46c30ac49d21",
+"fromAccount": null,
+"toAccount": "ACC-123",
+"amount": 1000.00,
+"currency": "USD",
+"type": 0,
+"timestamp": "2026-04-30T09:20:05.931091+00:00",
+"status": 1
+}
+
+----------------------------------
+
+🟢 3. Creating a Withdrawal from ACC-123 (00)
+{
+"id": "5c5ad848-820f-4318-be29-d9bcedfb6323",
+"fromAccount": "ACC-123",
+"toAccount": null,
+"amount": 200.00,
+"currency": "USD",
+"type": 1,
+"timestamp": "2026-04-30T09:20:06.963827+00:00",
+"status": 1
+}
+
+----------------------------------
+
+🟢 4. Creating a Transfer from ACC-123 to ACC-456 (50)
+{
+"id": "51e789e4-1fd3-4c20-a9c8-b0e19937735f",
+"fromAccount": "ACC-123",
+"toAccount": "ACC-456",
+"amount": 150.00,
+"currency": "USD",
+"type": 2,
+"timestamp": "2026-04-30T09:20:07.994453+00:00",
+"status": 1
+}
+
+----------------------------------
+
+🔍 5. Fetching Account Balance for ACC-123 (Expected: 650)
+{
+"accountId": "ACC-123",
+"balance": 650.00
+}
+
+----------------------------------
+
+📊 6. Fetching Account Summary for ACC-123
+{
+"accountId": "ACC-123",
+"totalDeposits": 1000.00,
+"totalWithdrawals": 350.00,
+"numberOfTransactions": 3,
+"mostRecentTransactionDate": "2026-04-30T09:20:07.994453+00:00"
+}
+
+----------------------------------
+
+🔎 7. Filtering Transactions (Type = Transfer)
+[
+{
+"id": "51e789e4-1fd3-4c20-a9c8-b0e19937735f",
+"fromAccount": "ACC-123",
+"toAccount": "ACC-456",
+"amount": 150.00,
+"currency": "USD",
+"type": 2,
+"timestamp": "2026-04-30T09:20:07.994453+00:00",
+"status": 1
+}
+]
+
+----------------------------------
+
+🚨 8. Testing Rate Limiter (Sending 110 rapid requests...)
+Request 94: 🔴 429 Too Many Requests (Rate limit hit!)

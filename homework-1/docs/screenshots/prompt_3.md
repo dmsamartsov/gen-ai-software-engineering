@@ -1,0 +1,1 @@
+Create short how to run the application guide. Cover option that person who will run it don't have .net installed. 
