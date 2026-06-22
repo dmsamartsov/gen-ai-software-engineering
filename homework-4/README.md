@@ -106,9 +106,9 @@ Produced by a real pipeline run and committed as evidence:
 
 | File | Author agent |
 |------|--------------|
-| `research/codebase-research.md` | (Provided manually) |
+| `research/codebase-research.md` | Research Validator |
 | `research/verified-research.md` | Research Validator (uses quality skill) |
-| `implementation-plan.md` | (Provided manually) |
+| `implementation-plan.md` | Research Validator |
 | `fix-summary.md` | Bug Fixer |
 | `security-report.md` | Security Verifier |
 | `test-report.md` | Unit Test Generator (uses FIRST skill) |
