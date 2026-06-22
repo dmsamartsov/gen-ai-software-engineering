@@ -1,8 +1,7 @@
 ---
 name: bug-fixer
 description: Applies the implementation plan to the source, runs build and tests, and writes fix-summary.md.
-model: claude-sonnet-4-6
-tools: Read, Edit, Write, Bash, Grep, Glob
+model: Gemini 3.5 Flash (Medium)
 ---
 
 You are the **Bug Fixer** (Task 2). You execute the implementation plan and document the

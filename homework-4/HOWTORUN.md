@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - **.NET SDK 10** — verify with `dotnet --version` (any `10.x`).
-- **Claude Code CLI** — `claude --version` (used by the pipeline). Only needed for
+- **Antigravity CLI** — `agy` (used by the pipeline). Only needed for
   *reproduce mode* below; *inspect mode* needs only .NET.
 
 All commands below are run from the `homework-4/` directory.
@@ -61,21 +61,21 @@ dotnet test WikiApi.sln
 ./run-pipeline.sh
 ```
 
-This runs all stages in order (Researcher → Verifier → Planner → Fixer → Security
-Verifier → Test Generator), parsing each agent's model/tools from its `*.agent.md`
+This runs all stages in order (Verifier → Fixer → Security
+Verifier → Test Generator), parsing each agent's model from its `SKILL.md`
 frontmatter and loading the relevant skill automatically. Outputs land in
 `context/bugs/001/` (and per-stage logs in `.pipeline-logs/`).
 
-> The pipeline runs **real** `claude -p` stages, so it consumes Claude API tokens.
+> The pipeline runs **real** `agy -p` stages, so it consumes API tokens.
 > Editing stages (Bug Fixer, Unit Test Generator) run with
-> `--permission-mode bypassPermissions` so they can edit files and run `dotnet`
-> non-interactively; read-only stages are restricted to `Read,Grep,Glob`.
+> `--dangerously-skip-permissions` so they can edit files and run `dotnet`
+> non-interactively.
 
 ---
 
 ## Two ways to evaluate
 
-### Inspect mode (no Claude tokens)
+### Inspect mode (no API tokens)
 The repository already contains the fixed `src/`, the generated `tests/`, and all agent
 outputs in `context/bugs/001/`. To verify without running any agent:
 
