@@ -55,7 +55,7 @@ public class DocumentStore : IDocumentStore
         // BUG #2: an update stamps "now" onto CreatedAt (destroying the original
         // creation date) and never advances UpdatedAt. The two timestamps end up
         // inverted: CreatedAt moves forward on every edit while UpdatedAt is frozen.
-        existing.CreatedAt = _timeProvider.GetUtcNow();
+        existing.UpdatedAt = _timeProvider.GetUtcNow();
 
         return existing;
     }
@@ -73,9 +73,9 @@ public class DocumentStore : IDocumentStore
         // search for "vpn" never matches the "VPN Setup" page. Wiki search should be
         // case-insensitive across title, content, and tags.
         return _documents.Values
-            .Where(d => d.Title.Contains(query)
-                        || d.Content.Contains(query)
-                        || d.Tags.Any(t => t.Contains(query)))
+            .Where(d => d.Title.Contains(query, StringComparison.OrdinalIgnoreCase)
+                        || d.Content.Contains(query, StringComparison.OrdinalIgnoreCase)
+                        || d.Tags.Any(t => t.Contains(query, StringComparison.OrdinalIgnoreCase)))
             .OrderBy(d => d.Title)
             .ToList();
     }
