@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+#
+# Single-command 4-agent bug-fix pipeline for the Internal Wiki API using Antigravity 2.0.
+#
+# Run order (4-agent pipeline):
+#   Research Validator -> Bug Fixer -> Security Verifier -> Unit Test Generator
+#
+set -euo pipefail
+export PATH="$HOME/.local/bin:$PATH"
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$ROOT"
+
+SLN="$ROOT/WikiApi.sln"
+BUGDIR="$ROOT/context/bugs/001"
+AGENTS="$ROOT/agents"
+SKILLS="$ROOT/skills"
+LOGDIR="$ROOT/.pipeline-logs"
+mkdir -p "$BUGDIR/research" "$LOGDIR"
+
+# ---------------------------------------------------------------- helpers --
+frontmatter() {            # $1 = agent file, $2 = key  -> trimmed value
+  grep -E "^$2:" "$1" | head -1 | cut -d: -f2- | tr -d ' '
+}
+banner() {
+  echo
+  echo "=================================================================="
+  echo ">>> $1"
+  echo "=================================================================="
+}
+build_sys() {              # $1 = agent file, $2 = optional skill file  -> stdout
+  cat "$1"
+  if [ -n "${2:-}" ] && [ -f "${2:-}" ]; then
+    printf '\n\n# ===== Appended skill: %s =====\n' "$(basename "$2")"
+    cat "$2"
+  fi
+}
+
+command -v agy  >/dev/null 2>&1 || { echo "ERROR: 'agy' CLI not found on PATH." >&2; exit 1; }
+command -v dotnet  >/dev/null 2>&1 || { echo "ERROR: 'dotnet' SDK not found on PATH."  >&2; exit 1; }
+
+# report-only stage: the agent writes its final message to a file using a write tool
+run_report_stage() {       # $1 agent  $2 prompt  $3 outfile  [$4 skill]
+  local agent="$1" prompt="$2" outfile="$3" skill="${4:-}"
+  local model
+  model="$(frontmatter "$agent" model)"
+  local logfile="$LOGDIR/$(basename "$(dirname "$agent")").log"
+  echo "  agent=$(basename "$(dirname "$agent")")  model=$model  ->  ${outfile#$ROOT/}"
+  
+  local full_prompt
+  full_prompt="System Instructions:
+$(build_sys "$agent" "$skill")
+
+Task:
+$prompt
+
+CRITICAL INSTRUCTION: You MUST use the write_to_file tool (or equivalent) to save your final markdown output to the absolute path: $outfile. DO NOT output the markdown as your conversational response. When finished, simply state that you have saved the file."
+
+  agy -p "$full_prompt" \
+    --model "$model" \
+    --dangerously-skip-permissions \
+    --print-timeout 30m \
+    --add-dir "$ROOT" \
+    | tee "$logfile"
+}
+
+# editing stage: the agent edits source and writes its own artifact; stdout -> log --
+run_edit_stage() {         # $1 agent  $2 prompt  $3 logfile  [$4 skill]
+  local agent="$1" prompt="$2" logfile="$3" skill="${4:-}"
+  local model
+  model="$(frontmatter "$agent" model)"
+  echo "  agent=$(basename "$(dirname "$agent")")  model=$model  (edits source)  ->  log ${logfile#$ROOT/}"
+  
+  local full_prompt
+  full_prompt="System Instructions:
+$(build_sys "$agent" "$skill")
+
+Task:
+$prompt"
+
+  agy -p "$full_prompt" \
+    --model "$model" \
+    --dangerously-skip-permissions \
+    --print-timeout 30m \
+    --add-dir "$ROOT" \
+    | tee "$logfile"
+}
+
+# --------------------------------------------------------------- pipeline --
+banner "Stage 0 — Preflight: build the (buggy) baseline"
+dotnet build "$SLN"
+
+banner "Stage 1 — Research Validator (research-quality-measurement skill)"
+run_edit_stage "$AGENTS/research-validator/SKILL.md" \
+  "Research the defects from context/bugs/001/bug-context.md, verify your findings against the codebase, and write THREE files: codebase-research.md, verified-research.md, and implementation-plan.md using the write tools." \
+  "$LOGDIR/research-validator.log" \
+  "$SKILLS/research-quality-measurement.md"
+
+banner "Stage 2 — Bug Fixer (applies plan, runs tests)"
+run_edit_stage "$AGENTS/bug-fixer/SKILL.md" \
+  "Apply context/bugs/001/implementation-plan.md to src/WikiApi. Run 'dotnet build WikiApi.sln' then 'dotnet test WikiApi.sln'. Write context/bugs/001/fix-summary.md." \
+  "$LOGDIR/bug-fixer.log"
+
+banner "Stage 3 — Security Verifier (report only, on changed code)"
+run_report_stage "$AGENTS/security-verifier/SKILL.md" \
+  "Review the changed files referenced by context/bugs/001/fix-summary.md for vulnerabilities, confirm SEC-1 and SEC-2 are resolved, and produce security-report.md. Do not edit any code." \
+  "$BUGDIR/security-report.md"
+
+banner "Stage 4 — Unit Test Generator (unit-tests-FIRST skill, runs tests)"
+run_edit_stage "$AGENTS/unit-test-generator/SKILL.md" \
+  "Generate FIRST-compliant xUnit tests for the changed code into tests/WikiApi.Tests, run 'dotnet test WikiApi.sln' until the suite is green, and write context/bugs/001/test-report.md." \
+  "$LOGDIR/unit-test-generator.log" \
+  "$SKILLS/unit-tests-FIRST.md"
+
+banner "Stage 5 — Postflight: full test run"
+dotnet test "$SLN"
+
+banner "Pipeline complete"
+echo "Artifacts:"
+ls -1 "$BUGDIR" "$BUGDIR/research" | sed 's/^/  /'

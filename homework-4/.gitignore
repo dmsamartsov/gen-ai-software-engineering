@@ -1,0 +1,12 @@
+# Build output
+bin/
+obj/
+
+# Pipeline run logs
+.pipeline-logs/
+
+# IDE / OS
+*.user
+.vs/
+.idea/
+.DS_Store
