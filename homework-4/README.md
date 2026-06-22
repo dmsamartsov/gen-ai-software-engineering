@@ -15,12 +15,12 @@ task-appropriate model.
 
 ```mermaid
 flowchart LR
-  V["Research Verifier<br/>(Pro)"] --> F["Bug Fixer<br/>(Flash)"]
+  V["Research Validator<br/>(Pro)"] --> F["Bug Fixer<br/>(Flash)"]
   F --> S["Security Verifier<br/>(Pro)"]
   F --> T["Unit Test Generator<br/>(Flash)"]
 ```
 
-**Run order:** Research Verifier → Bug Fixer → Security Verifier (on changed code) → Unit Test Generator (on changed code).
+**Run order:** Research Validator → Bug Fixer → Security Verifier (on changed code) → Unit Test Generator (on changed code).
 
 Run it all with one command:
 
@@ -30,8 +30,7 @@ cd homework-4
 ```
 
 The four agents are the Research Verifier, Bug Fixer, Security Verifier, and
-Unit Test Generator (Tasks 1–4). The codebase research and implementation plans are
-assumed to be provided manually.
+Unit Test Generator (Tasks 1–4). The pipeline is fully automated and runs using only the `bug-context.md` as its initial input!
 
 ---
 
@@ -43,7 +42,7 @@ from the frontmatter** and passes the skill instructions dynamically via prompt 
 
 | Agent | Model | Why this model |
 |-------|-------|----------------|
-| `research-verifier` | **Gemini 3.1 Pro (High)** | Fact-checking every `file:line` and snippet is precision-critical; the strongest reasoning model is justified. |
+| `research-validator` | **Gemini 3.1 Pro (High)** | Fact-checking every `file:line` and snippet is precision-critical; the strongest reasoning model is justified. |
 | `bug-fixer` | **Gemini 3.5 Flash (Medium)** | Mechanical, well-specified application of a plan with reliable tool use. |
 | `security-verifier` | **Gemini 3.1 Pro (High)** | Highest-stakes judgement — severity calibration and security reasoning on changed code. |
 | `unit-test-generator` | **Gemini 3.5 Flash (Medium)** | Fast, routine xUnit scaffolding against a small, well-specified surface. |
@@ -108,7 +107,7 @@ Produced by a real pipeline run and committed as evidence:
 | File | Author agent |
 |------|--------------|
 | `research/codebase-research.md` | (Provided manually) |
-| `research/verified-research.md` | Research Verifier (uses quality skill) |
+| `research/verified-research.md` | Research Validator (uses quality skill) |
 | `implementation-plan.md` | (Provided manually) |
 | `fix-summary.md` | Bug Fixer |
 | `security-report.md` | Security Verifier |
