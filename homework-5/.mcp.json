@@ -1,0 +1,35 @@
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+      }
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/dmytrosamartsov/Documents/repos/gen-ai-software-engineering"
+      ]
+    },
+    "notion": {
+      "type": "http",
+      "url": "https://mcp.notion.com/mcp"
+    },
+    "custom-lorem": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "custom-mcp-server",
+        "--with",
+        "fastmcp",
+        "python",
+        "server.py"
+      ]
+    }
+  }
+}

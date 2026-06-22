@@ -1,0 +1,13 @@
+[project]
+name = "custom-mcp-server"
+version = "0.1.0"
+description = "Homework 5 Task 4 — custom FastMCP server exposing lorem-ipsum.md as a resource and a read tool"
+readme = "../README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastmcp>=2.0.0",
+]
+
+[tool.fastmcp]
+# Entry point used by `fastmcp run` / `fastmcp install`.
+server = "server.py"
