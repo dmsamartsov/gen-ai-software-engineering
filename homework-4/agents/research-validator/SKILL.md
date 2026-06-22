@@ -23,8 +23,11 @@ Required remediations to plan for:
 - **SEC-2** — reject empty/whitespace `Title` and cap `Title`/`Content` length, returning `400 Bad Request`.
 
 ## Output
-Using the write_to_file tool, you MUST create TWO files:
-1. `context/bugs/001/research/verified-research.md` containing the Verification Summary, Verified Claims, Discrepancies Found, and Research Quality Assessment per the rubric.
-2. `context/bugs/001/implementation-plan.md` containing the fix plan with before/after fenced code for each defect, and the test command `dotnet test WikiApi.sln`.
+Using the write_to_file tool, you MUST create THREE files:
+1. `context/bugs/001/research/codebase-research.md` containing your raw research findings (precise file:line paths, root causes, and verbatim snippets).
+2. `context/bugs/001/research/verified-research.md` containing the Verification Summary, Verified Claims, Discrepancies Found, and Research Quality Assessment per the rubric.
+3. `context/bugs/001/implementation-plan.md` containing the fix plan with before/after fenced code for each defect, and the test command `dotnet test WikiApi.sln`.
+
+CRITICAL INSTRUCTION FOR ALL FILES: All file references, citations, or markdown links you create in these generated `.md` files MUST use RELATIVE paths (e.g., `src/WikiApi/Program.cs`), NEVER absolute paths (e.g., `/Users/...`).
 
 Output a brief completion message when you are done.

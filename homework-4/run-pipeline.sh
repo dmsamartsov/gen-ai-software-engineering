@@ -92,7 +92,7 @@ dotnet build "$SLN"
 
 banner "Stage 1 — Research Validator (research-quality-measurement skill)"
 run_edit_stage "$AGENTS/research-validator/SKILL.md" \
-  "Research the defects from context/bugs/001/bug-context.md, verify your findings against the codebase, and write BOTH context/bugs/001/research/verified-research.md and context/bugs/001/implementation-plan.md using the write tools." \
+  "Research the defects from context/bugs/001/bug-context.md, verify your findings against the codebase, and write THREE files: codebase-research.md, verified-research.md, and implementation-plan.md using the write tools." \
   "$LOGDIR/research-validator.log" \
   "$SKILLS/research-quality-measurement.md"
 
