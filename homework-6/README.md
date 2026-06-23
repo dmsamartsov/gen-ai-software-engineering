@@ -1,6 +1,8 @@
 # Multi-Agent Banking Pipeline
 
 **Created by: Dmytro Samartsov**
+**Date Submitted**: 23.06.2026
+**AI Tools Used**: Antigravity CLI, Claude Code
 
 ## Overview
 This system is an AI-powered transaction processing pipeline built to simulate core banking operations. It processes raw financial transactions through a series of automated, asynchronous "agents" that validate data, detect fraud based on risk parameters, and simulate transaction settlement. The pipeline operates entirely on a file-based JSON messaging protocol, passing files through shared staging directories.
