@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "/opt/homebrew/bin/npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "pipeline-status": {
+      "command": "/opt/homebrew/bin/python3.12",
+      "args": ["/Users/dmytrosamartsov/Documents/repos/gen-ai-software-engineering copy/homework-6/mcp/server.py"]
+    }
+  }
+}
